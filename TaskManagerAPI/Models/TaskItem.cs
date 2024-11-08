@@ -12,5 +12,9 @@ namespace TaskManagerAPI.Models
         public DateTime DueDate { get; set; }
         [Required]
         public string Priority { get; set; }
+        public int AssigneeId { get; set; }
+        public User? Assignee { get; set; }
+        public ICollection<Checklist>? CheckLists { get; set; }
+
     }
 }

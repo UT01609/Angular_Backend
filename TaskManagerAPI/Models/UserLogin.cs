@@ -5,6 +5,7 @@ namespace TaskManagerAPI.Models
 {
     public class UserLogin
     {
+        [Key]
         public Guid UserId { get; set; }
         [Required]
         public string FullName { get; set; }

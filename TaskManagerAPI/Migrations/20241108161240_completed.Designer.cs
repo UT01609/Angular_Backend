@@ -12,8 +12,8 @@ using TaskManagerAPI.Data;
 namespace TaskManagerAPI.Migrations
 {
     [DbContext(typeof(TaskContext))]
-    [Migration("20241102061136_address")]
-    partial class address
+    [Migration("20241108161240_completed")]
+    partial class completed
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -56,6 +56,31 @@ namespace TaskManagerAPI.Migrations
                     b.ToTable("Address");
                 });
 
+            modelBuilder.Entity("TaskManagerAPI.Models.Checklist", b =>
+                {
+                    b.Property<int>("id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
+
+                    b.Property<bool>("IsDone")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TaskId")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("TaskId");
+
+                    b.ToTable("Checklist");
+                });
+
             modelBuilder.Entity("TaskManagerAPI.Models.TaskItem", b =>
                 {
                     b.Property<int>("Id")
@@ -63,6 +88,9 @@ namespace TaskManagerAPI.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AssigneeId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -80,6 +108,8 @@ namespace TaskManagerAPI.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AssigneeId");
 
                     b.ToTable("Tasks");
                 });
@@ -113,6 +143,32 @@ namespace TaskManagerAPI.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("TaskManagerAPI.Models.UserLogin", b =>
+                {
+                    b.Property<Guid>("UserId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Password")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("role")
+                        .HasColumnType("int");
+
+                    b.HasKey("UserId");
+
+                    b.ToTable("UsersLogin");
+                });
+
             modelBuilder.Entity("TaskManagerAPI.Models.Address", b =>
                 {
                     b.HasOne("TaskManagerAPI.Models.User", "User")
@@ -124,9 +180,38 @@ namespace TaskManagerAPI.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("TaskManagerAPI.Models.Checklist", b =>
+                {
+                    b.HasOne("TaskManagerAPI.Models.TaskItem", "Task")
+                        .WithMany("CheckLists")
+                        .HasForeignKey("TaskId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Task");
+                });
+
+            modelBuilder.Entity("TaskManagerAPI.Models.TaskItem", b =>
+                {
+                    b.HasOne("TaskManagerAPI.Models.User", "Assignee")
+                        .WithMany("items")
+                        .HasForeignKey("AssigneeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Assignee");
+                });
+
+            modelBuilder.Entity("TaskManagerAPI.Models.TaskItem", b =>
+                {
+                    b.Navigation("CheckLists");
+                });
+
             modelBuilder.Entity("TaskManagerAPI.Models.User", b =>
                 {
                     b.Navigation("address");
+
+                    b.Navigation("items");
                 });
 #pragma warning restore 612, 618
         }

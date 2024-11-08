@@ -8,6 +8,6 @@
         public string Password { get; set; }
         public string Phone { get; set; }
         public Address? address { get; set; }
-        //public List<TaskItem> items { get; set; }
+        public ICollection<TaskItem> items { get; set; }
     }
 }
